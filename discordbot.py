@@ -5,7 +5,7 @@ from voice_generator import creat_WAV
 import os
 import traceback
 
-bot = commands.Bot(command_prefix='')
+bot = commands.Bot(command_prefix='!be')
 token = os.environ['DISCORD_BOT_TOKEN']
 voice_client = None
 
@@ -16,7 +16,7 @@ async def on_ready():
     print('------')
 
 
-@bot.command()
+@bot.command(aliases=["call","summon"])
 async def join(ctx):
     #voicechannelを取得
     vc = ctx.author.voice.channel
