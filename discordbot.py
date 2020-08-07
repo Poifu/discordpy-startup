@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import subprocess
-import ffmpeg
 from voice_generator import creat_WAV
 
 bot = commands.Bot(command_prefix='/')
