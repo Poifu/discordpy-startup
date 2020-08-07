@@ -1,21 +1,49 @@
+import discord
 from discord.ext import commands
-import os
-import traceback
+import subprocess
+import ffmpeg
+from voice_generator import creat_WAV
 
 bot = commands.Bot(command_prefix='/')
 token = os.environ['DISCORD_BOT_TOKEN']
 
 
+client = commands.Bot(command_prefix='.')
+voice_client = None
+
+
 @bot.event
-async def on_command_error(ctx, error):
-    orig_error = getattr(error, "original", error)
-    error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
-    await ctx.send(error_msg)
+async def on_ready():
+    print('Logged in as')
+    print(client.user.name)
+    print(client.user.id)
+    print('------')
 
 
 @bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
+async def join(ctx):
+    #voicechannelを取得
+    vc = ctx.author.voice.channel
+    #voicechannelに接続
+    await vc.connect()
 
+@bot.command()
+async def bye(ctx):
+    #切断
+    await ctx.voice_client.disconnect()
+
+@bot.event
+async def on_message(message):
+    if message.content.startswith('.'):
+        pass
+
+    else:
+        if message.guild.voice_client:
+            print(message.content)
+            creat_WAV(message.content)
+            source = discord.FFmpegPCMAudio("output.wav")
+            message.guild.voice_client.play(source)
+        else:
+            pass
 
 bot.run(token)
