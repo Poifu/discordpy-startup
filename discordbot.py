@@ -18,6 +18,10 @@ async def on_ready():
 
 @bot.command(aliases=["call","summon"])
 async def join(ctx):
+    voice_state = ctx.author.voice
+    if (not voice_state) or (not voice_state.channel):
+    await ctx.send("先にボイスチャンネルに入っている必要があります。")
+    return
     #voicechannelを取得
     vc = ctx.author.voice.channel
     #voicechannelに接続
