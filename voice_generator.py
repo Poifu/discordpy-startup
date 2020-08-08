@@ -22,13 +22,13 @@ def creat_WAV(inputText):
     with open(input_file,'w',encoding='shift_jis') as file:
         file.write(inputText)
 
-    command = '/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
+    command = './open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
 
     #辞書のPath
-    x = '/open_jtalk/bin/dic'
+    x = './open_jtalk/bin/dic'
 
     #ボイスファイルのPath
-    m = '/open_jtalk/bin/mei/mei_normal.htsvoice'
+    m = './open_jtalk/bin/mei/mei_normal.htsvoice'
 
     #発声のスピード
     r = '1.0'
