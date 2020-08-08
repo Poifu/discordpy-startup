@@ -3,7 +3,7 @@ from discord.ext import commands
 import asyncio
 import os
 import subprocess
-from voice_generator import creat_WAV
+#from voice_generator import creat_WAV
 
 bot = commands.Bot(command_prefix='/')
 token = os.environ['DISCORD_BOT_TOKEN']
@@ -38,6 +38,9 @@ async def bye(ctx):
     print('#voicechannelから切断')
     await ctx.voice_client.disconnect()
 
+@bot.command()
+async def ping(ctx):
+    await ctx.send('pong')
 
 
 bot.run(token)
