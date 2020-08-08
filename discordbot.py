@@ -5,7 +5,6 @@ import os
 import subprocess
 from voice_generator import creat_WAV
 
-
 bot = commands.Bot(command_prefix='.')
 token = os.environ['DISCORD_BOT_TOKEN']
 voice_client = None
