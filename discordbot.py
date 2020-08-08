@@ -42,7 +42,7 @@ async def bye(ctx):
 async def ping(ctx):
     await ctx.send('pong')
 
-@client.event
+@bot.event
 async def on_message(message):
     msgclient = message.guild.voice_client
     if message.content.startswith('.'):
