@@ -42,5 +42,20 @@ async def bye(ctx):
 async def ping(ctx):
     await ctx.send('pong')
 
+@client.event
+async def on_message(message):
+    msgclient = message.guild.voice_client
+    if message.content.startswith('.'):
+        pass
+
+    else:
+        if message.guild.voice_client:
+            print(message.content)
+            creat_WAV(message.content)
+            source = discord.FFmpegPCMAudio("output.wav")
+            message.guild.voice_client.play(source)
+        else:
+            pass
+    await client.process_commands(message)
 
 bot.run(token)
