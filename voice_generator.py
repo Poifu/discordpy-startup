@@ -17,7 +17,7 @@ def urlAbb(text):
 # message.contentをテキストファイルに書き込み
 def creat_WAV(inputText):
         #message.contentをテキストファイルに書き込み
-    input_file = './open_jtalk/bin/input.txt'
+    input_file = 'c:\\input.txt'
 
     with open(input_file,'w',encoding='shift_jis') as file:
         file.write(inputText)
@@ -34,7 +34,7 @@ def creat_WAV(inputText):
     r = '1.0'
 
     #出力ファイル名　and　Path
-    ow = 'output.wav'
+    ow = 'c:\\output.wav'
 
     args= {'x':x, 'm':m, 'r':r, 'ow':ow, 'input_file':input_file}
 
