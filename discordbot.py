@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
+import asyncio
 import subprocess
 from voice_generator import creat_WAV
 import os
-import traceback
+
 
 bot = commands.Bot(command_prefix='/')
 token = os.environ['DISCORD_BOT_TOKEN']
@@ -19,9 +20,11 @@ async def on_ready():
 @bot.command(aliases=["call","summon"])
 async def join(ctx):
     voice_state = ctx.author.voice
+    
     if (not voice_state) or (not voice_state.channel):
     await ctx.send("先にボイスチャンネルに入っている必要があります。")
     return
+
     #voicechannelを取得
     vc = ctx.author.voice.channel
     #voicechannelに接続
