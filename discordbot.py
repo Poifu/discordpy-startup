@@ -38,18 +38,6 @@ async def bye(ctx):
     print('#voicechannelから切断')
     await ctx.voice_client.disconnect()
 
-@bot.event
-async def on_message(message):
-    if message.content.startswith('.'):
-        pass
 
-    else:
-        if message.guild.voice_client:
-            print(message.content)
-            creat_WAV(message.content)
-            source = discord.FFmpegPCMAudio("output.wav")
-            message.guild.voice_client.play(source)
-        else:
-            pass
 
 bot.run(token)
