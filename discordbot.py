@@ -1,15 +1,18 @@
 import discord
 from discord.ext import commands
 import asyncio
-import subprocess
-from voice_generator import creat_WAV
 import os
+import subprocess
+import ffmpeg
+from voice_generator import creat_WAV
 
 
-bot = commands.Bot(command_prefix='/')
+bot = commands.Bot(command_prefix='.')
 token = os.environ['DISCORD_BOT_TOKEN']
 voice_client = None
 
+if not discord.opus.is_loaded():
+    discord.opus.load_opus("heroku-buildpack-libopus")
 
 @bot.event
 async def on_ready():
@@ -17,7 +20,7 @@ async def on_ready():
     print('------')
 
 
-@bot.command(aliases=["call","summon"])
+@bot.command(aliases=["connect","summon"]) #connectやsummonでも呼び出せる
 async def join(ctx):
     voice_state = ctx.author.voice
     #ルームに入っていない場合
