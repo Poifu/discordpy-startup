@@ -25,13 +25,16 @@ async def join(ctx):
     #await ctx.send("先にボイスチャンネルに入っている必要があります。")
     #return
     #voicechannelを取得
+    print('#voicechannelを取得')
     vc = ctx.author.voice.channel
     #voicechannelに接続
+    print('#voicechannelに接続')
     await vc.connect()
 
 @bot.command()
 async def bye(ctx):
     #切断
+    print('#voicechannelから切断')
     await ctx.voice_client.disconnect()
 
 @bot.event
