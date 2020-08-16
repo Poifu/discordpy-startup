@@ -1,6 +1,6 @@
 import os
 import subprocess
-from pydub import AudioSegment
+# from pydub import AudioSegment
 
 class VoiceChannel:
     def __init__(self):
