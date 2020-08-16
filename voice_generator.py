@@ -12,7 +12,7 @@ class creat_WAV:
         }
 
 
-    def creat_WAV(self, text, filepath='/tmp/voice_message',voicetype='mei',emotion='normal'):
+    def creat_WAV(self, text):
         filepath='/tmp/voice_message'
         voicetype='mei'
         emotion='normal'
