@@ -1,179 +1,62 @@
-import MeCab
-import json
 import discord
+from discord.ext import commands
+import asyncio
 import os
 import subprocess
-from pydub import AudioSegment
+from voice_generator import creat_WAV
 
-class CommonModule:
-    def load_json(self, file):
-        with open(file, 'r', encoding='utf-8') as f:
-            json_data = json.load(f)
-        return json_data
+bot = commands.Bot(command_prefix='/')
+token = os.environ['DISCORD_BOT_TOKEN']
+voice_client = None
 
-class NLP:
-    def __init__(self):
-        self.cm = CommonModule()
+#if not discord.opus.is_loaded():
+#    discord.opus.load_opus("heroku-buildpack-libopus")
 
-    def morphological_analysis(self, text, keyword='-Ochasen'):
-        words = []
-        tagger = MeCab.Tagger(keyword)
-        result = tagger.parse(text)
-        result = result.split('\n')
-        result = result[:-2]
-
-        for word in result:
-            temp = word.split('\t')
-            print(word)
-            word_info = {
-                'surface': temp[0],
-                'kana': temp[1],
-                'base': temp[2],
-                'pos': temp[3],
-                'conjugation': temp[4],
-                'form': temp[5]
-            }
-            words.append(word_info)
-        return words
-
-    def evaluate_pn_ja_wordlist(self, wordlist, word_pn_dictpath=None):
-        if word_pn_dictpath is None:
-            word_pn_dict = self.cm.load_json('pn_ja.json')
-        else:
-            word_pn_dict = self.cm.load_json(word_pn_dictpath)
-
-        pn_value = 0
-        for word in wordlist:
-            pn_value += self.evaluate_pn_ja_word(word, word_pn_dict)
-
-        return pn_value
-
-    def evaluate_pn_ja_word(self, word, word_pn_dict:dict):
-        if type(word) is dict:
-            word = word['base']
-        elif type(word) is str:
-            pass
-        else:
-            raise TypeError
-
-        if word in word_pn_dict.keys():
-            pn_value = float(word_pn_dict[word]['value'])
-            return pn_value
-        return 0
-
-    def analysis_emotion(self, text):
-            split_words = self.morphological_analysis(text, "-Ochasen")
-            pn_value = self.evaluate_pn_ja_wordlist(split_words)
-            if pn_value > 0.5:
-                emotion = 'happy'
-            elif pn_value < -1.0:
-                emotion = 'angry'
-            elif pn_value < -0.5:
-                emotion = 'sad'
-            else:
-                emotion = 'normal'
-            return emotion
-
-class VoiceChannel:
-    def __init__(self):
-        self.conf = {
-            "voice_configs": {
-                "htsvoice_resource": "/usr/local/Cellar/open-jtalk/1.11/voice/",
-                "jtalk_dict": "/usr/local/Cellar/open-jtalk/1.11/dic"
-            }
-        }
-
-
-    def make_by_jtalk(self, text, filepath='voice_message', voicetype='mei', emotion='normal'):
-        htsvoice = {
-            'mei': {
-                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_normal.htsvoice')],
-                'angry': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_angry.htsvoice')],
-                'bashful': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_bashful.htsvoice')],
-                'happy': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_happy.htsvoice')],
-                'sad': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_sad.htsvoice')]
-            },
-            'm100': {
-                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'm100/nitech_jp_atr503_m001.htsvoice')]
-            },
-            'tohoku-f01': {
-                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-neutral.htsvoice')],
-                'angry': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-angry.htsvoice')],
-                'happy': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-happy.htsvoice')],
-                'sad': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-sad.htsvoice')]
-            }
-        }
-
-        open_jtalk = ['open_jtalk']
-        mech = ['-x', self.conf['voice_configs']['jtalk_dict']]
-        speed = ['-r', '1.0']
-        outwav = ['-ow', filepath+'.wav']
-        cmd = open_jtalk + mech + htsvoice[voicetype][emotion] + speed + outwav
-        c = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-        c.stdin.write(text.encode())
-        c.stdin.close()
-        c.wait()
-        audio_segment = AudioSegment.from_wav(filepath+'.wav')
-        os.remove(filepath+'.wav')
-        audio_segment.export(filepath+'.mp3', format='mp3')
-        return filepath+'.mp3'
-
-    def after_play(self, e):
-        print(e)
-
-client = discord.Client()
-client_id = 'your_client_id'
-
-voice = None
-volume = None
-
-@client.event
+@bot.event
 async def on_ready():
-    # 起動時の処理
-    print('Bot is wake up.')
+    print('Logged in as')
+    print('------')
 
-@client.event
+
+@bot.command(aliases=["connect","summon"]) #connectやsummonでも呼び出せる
+async def join(ctx):
+    voice_state = ctx.author.voice
+    #ルームに入っていない場合
+    #if (not voice_state) or (not voice_state.channel):
+    #await ctx.send("先にボイスチャンネルに入っている必要があります。")
+    #return
+    #voicechannelを取得
+    print('#voicechannelを取得')
+    vc = ctx.author.voice.channel
+    #voicechannelに接続
+    print('#voicechannelに接続')
+    await vc.connect()
+
+@bot.command()
+async def bye(ctx):
+    #切断
+    print('#voicechannelから切断')
+    await ctx.voice_client.disconnect()
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send('pong')
+
+@bot.event
 async def on_message(message):
-    nlp = NLP()
-    vc = VoiceChannel()
-    # テキストチャンネルにメッセージが送信されたときの処理
-    global voice, volume, read_mode
+    msgclient = message.guild.voice_client
+    if message.content.startswith('.'):
+        pass
 
-    if voice is True and volume is None:
-            source = discord.PCMVolumeTransformer(voice.source)
-            volume = source.volume
-
-    if client.user != message.author:
-        text = message.content
-        if text == '!login':
-            channel = message.author.voice.channel
-            voice = await channel.connect()
-            await message.channel.send('ボイスチャンネルにログインしました')
-        elif text == '!logout':
-            await voice.disconnect()
-            await message.channel.send('ボイスチャンネルからログアウトしました')
-        elif text == '!status':
-            if voice.is_connected():
-                await message.channel.send('ボイスチャンネルに接続中です')
-        elif text == '!volume_up':
-            volume += 0.1
-            await message.channel.send('音量を上げました')
-        elif text == '!volume_down':
-            volume -= 0.1
-            await message.channel.send('音量を下げました')
-        elif text == '!bye':
-            await client.close()
-        elif text == '!read_mode_on':
-            read_mode = True
-            await message.channel.send('読み上げモードをオンにしました')
-        elif text == '!read_mode_off':
-            read_mode = False
-            await message.channel.send('読み上げモードをオフにしました')
+    else:
+        if message.guild.voice_client:
+            print(message.content)
+            emotion = 'normal'
+            creat_WAV(message.content,filepath,emotion)
+            source = discord.FFmpegPCMAudio("/app/open_jtalk/bin/output.wav")
+            message.guild.voice_client.play(source)
         else:
-            if read_mode:
-                emotion = nlp.analysis_emotion(text)
-                voice_file = vc.make_by_jtalk(text, filepath, emotion=emotion)
-                audio_source = discord.FFmpegPCMAudio(voice_file)
-                voice.play(audio_source, after=lambda e: vc.after_play(e))
+            pass
+    await bot.process_commands(message)
 
-client.run(client_id)
+bot.run(token)
