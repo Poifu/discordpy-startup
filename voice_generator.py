@@ -6,8 +6,8 @@ class VoiceChannel:
     def __init__(self):
         self.conf = {
             "voice_configs": {
-                "htsvoice_resource": "/usr/local/Cellar/open-jtalk/1.11/voice/",
-                "jtalk_dict": "/usr/local/Cellar/open-jtalk/1.11/dic"
+                "htsvoice_resource": "/app/open_jtalk/bin/",
+                "jtalk_dict": "/app/open_jtalk/bin/dic/"
             }
         }
 
