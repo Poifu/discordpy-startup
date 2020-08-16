@@ -1,6 +1,6 @@
 import subprocess
 import re
-from djangoproject.settings import BASE_DIR
+from chabotto.settings import BASE_DIR
 
 # remove_custom_emoji
 # 絵文字IDは読み上げない
@@ -23,13 +23,13 @@ def creat_WAV(inputText):
     with open(input_file,'w',encoding='shift_jis') as file:
         file.write(inputText)
 
-    command = BASE_DIR + '/discordpy-startup/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
+    command = BASE_DIR + '/app/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
 
     #辞書のPath
     x = './open_jtalk/bin/dic'
 
     #ボイスファイルのPath
-    m = BASE_DIR + '/discordpy-startup/open_jtalk/bin/mei/mei_normal.htsvoice'
+    m = BASE_DIR + '/app/open_jtalk/bin/mei/mei_normal.htsvoice'
 
     #発声のスピード
     r = '1.0'
