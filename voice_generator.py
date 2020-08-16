@@ -2,7 +2,7 @@ import os
 import subprocess
 # from pydub import AudioSegment
 
-class VoiceChannel:
+class creat_WAV:
     def __init__(self):
         self.conf = {
             "voice_configs": {
