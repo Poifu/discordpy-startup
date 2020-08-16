@@ -53,6 +53,7 @@ async def on_message(message):
             print(message.content)
             
             emotion = 'normal'
+            filepath='/tmp/voice_message'
             creat_WAV(message.content,filepath,emotion)
             source = discord.FFmpegPCMAudio(creat_WAV(message.content,filepath,emotion))
             message.guild.voice_client.play(source)
