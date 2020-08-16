@@ -1,49 +1,50 @@
+import os
 import subprocess
-import re
+from pydub import AudioSegment
 
-# remove_custom_emoji
-# 絵文字IDは読み上げない
-def remove_custom_emoji(text):
-    pattern = r'<:[a-zA-Z0-9_]+:[0-9]+>'    # カスタム絵文字のパターン
-    return re.sub(pattern,'',text)   # 置換処理
+class VoiceChannel:
+    def __init__(self):
+        self.conf = {
+            "voice_configs": {
+                "htsvoice_resource": "/usr/local/Cellar/open-jtalk/1.11/voice/",
+                "jtalk_dict": "/usr/local/Cellar/open-jtalk/1.11/dic"
+            }
+        }
 
-# urlAbb
-# URLなら省略
-def urlAbb(text):
-    pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
-    return re.sub(pattern,'URLは省略！',text)   # 置換処理
 
-# creat_WAV
-# message.contentをテキストファイルに書き込み
-def creat_WAV(inputText):
-        #message.contentをテキストファイルに書き込み
-    input_file = '/tmp/input.txt'
+    def creat_WAV(self, text, filepath='voice_message', voicetype='mei', emotion='normal'):
+        htsvoice = {
+            'mei': {
+                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_normal.htsvoice')],
+                'angry': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_angry.htsvoice')],
+                'bashful': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_bashful.htsvoice')],
+                'happy': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_happy.htsvoice')],
+                'sad': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_sad.htsvoice')]
+            },
+            'm100': {
+                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'm100/nitech_jp_atr503_m001.htsvoice')]
+            },
+            'tohoku-f01': {
+                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-neutral.htsvoice')],
+                'angry': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-angry.htsvoice')],
+                'happy': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-happy.htsvoice')],
+                'sad': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-sad.htsvoice')]
+            }
+        }
 
-    print(inputText)
-    with open(input_file,'w',encoding='shift_jis') as file:
-        file.write(inputText)
+        open_jtalk = ['open_jtalk']
+        mech = ['-x', self.conf['voice_configs']['jtalk_dict']]
+        speed = ['-r', '1.0']
+        outwav = ['-ow', filepath+'.wav']
+        cmd = open_jtalk + mech + htsvoice[voicetype][emotion] + speed + outwav
+        c = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+        c.stdin.write(text.encode())
+        c.stdin.close()
+        c.wait()
+        audio_segment = AudioSegment.from_wav(filepath+'.wav')
+        os.remove(filepath+'.wav')
+        audio_segment.export(filepath+'.mp3', format='mp3')
+        return filepath+'.mp3'
 
-#     command = '/app/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
-
-#     #辞書のPath
-#     x = '/app/open_jtalk/bin/dic'
-
-#     #ボイスファイルのPath
-#     m = '/app/open_jtalk/bin/mei/mei_normal.htsvoice'
-
-#     #発声のスピード
-#     r = '1.0'
-
-#     #出力ファイル名　and　Path
-#     ow = '/tmp/output.wav'
-
-#     args= {'x':x, 'm':m, 'r':r, 'ow':ow, 'input_file':input_file}
-
-#     cmd= command.format(**args)
-#     print(cmd)
-
-#     subprocess.run(cmd)
-    return True
-
-if __name__ == '__main__':
-    creat_WAV('テスト')
+    def after_play(self, e):
+        print(e)
