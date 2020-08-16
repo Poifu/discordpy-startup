@@ -12,7 +12,10 @@ class creat_WAV:
         }
 
 
-    def creat_WAV(self, text, filepath='/tmp/voice_message', voicetype='mei', emotion='normal'):
+    def creat_WAV(self, text, ):
+        filepath='/tmp/voice_message'
+        voicetype='mei'
+        emotion='normal'
         htsvoice = {
             'mei': {
                 'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_normal.htsvoice')],
