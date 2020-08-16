@@ -1,6 +1,5 @@
 import subprocess
 import re
-from chabotto.settings import BASE_DIR
 
 # remove_custom_emoji
 # 絵文字IDは読み上げない
@@ -23,13 +22,13 @@ def creat_WAV(inputText):
     with open(input_file,'w',encoding='shift_jis') as file:
         file.write(inputText)
 
-    command = BASE_DIR + '/app/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
+    command = '/app/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
 
     #辞書のPath
-    x = './open_jtalk/bin/dic'
+    x = '/app/open_jtalk/bin/dic'
 
     #ボイスファイルのPath
-    m = BASE_DIR + '/app/open_jtalk/bin/mei/mei_normal.htsvoice'
+    m = '/app/open_jtalk/bin/mei/mei_normal.htsvoice'
 
     #発声のスピード
     r = '1.0'
