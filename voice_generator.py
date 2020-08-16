@@ -12,7 +12,7 @@ class VoiceChannel:
         }
 
 
-    def creat_WAV(self, text, filepath='voice_message', voicetype='mei', emotion='normal'):
+    def creat_WAV(self, text, filepath='/tmp/voice_message', voicetype='mei', emotion='normal'):
         htsvoice = {
             'mei': {
                 'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_normal.htsvoice')],
@@ -41,10 +41,10 @@ class VoiceChannel:
         c.stdin.write(text.encode())
         c.stdin.close()
         c.wait()
-        audio_segment = AudioSegment.from_wav(filepath+'.wav')
-        os.remove(filepath+'.wav')
-        audio_segment.export(filepath+'.mp3', format='mp3')
-        return filepath+'.mp3'
+#         audio_segment = AudioSegment.from_wav(filepath+'.wav')
+#         os.remove(filepath+'.wav')
+#         audio_segment.export(filepath+'.mp3', format='mp3')
+        return filepath+'.wav'
 
     def after_play(self, e):
         print(e)
