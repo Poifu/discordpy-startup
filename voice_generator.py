@@ -22,26 +22,26 @@ def creat_WAV(inputText):
     with open(input_file,'w',encoding='shift_jis') as file:
         file.write(inputText)
 
-    command = '/app/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
+#     command = '/app/open_jtalk/bin/open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
 
-    #辞書のPath
-    x = '/app/open_jtalk/bin/dic'
+#     #辞書のPath
+#     x = '/app/open_jtalk/bin/dic'
 
-    #ボイスファイルのPath
-    m = '/app/open_jtalk/bin/mei/mei_normal.htsvoice'
+#     #ボイスファイルのPath
+#     m = '/app/open_jtalk/bin/mei/mei_normal.htsvoice'
 
-    #発声のスピード
-    r = '1.0'
+#     #発声のスピード
+#     r = '1.0'
 
-    #出力ファイル名　and　Path
-    ow = '/app/open_jtalk/bin/output.wav'
+#     #出力ファイル名　and　Path
+#     ow = '/app/open_jtalk/bin/output.wav'
 
-    args= {'x':x, 'm':m, 'r':r, 'ow':ow, 'input_file':input_file}
+#     args= {'x':x, 'm':m, 'r':r, 'ow':ow, 'input_file':input_file}
 
-    cmd= command.format(**args)
-    print(cmd)
+#     cmd= command.format(**args)
+#     print(cmd)
 
-    subprocess.run(cmd)
+#     subprocess.run(cmd)
     return True
 
 if __name__ == '__main__':
