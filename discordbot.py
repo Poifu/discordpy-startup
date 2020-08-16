@@ -4,6 +4,7 @@ import asyncio
 import os
 import subprocess
 from voice_generator import creat_WAV
+from djangoproject.settings import BASE_DIR
 
 bot = commands.Bot(command_prefix='/')
 token = os.environ['DISCORD_BOT_TOKEN']
@@ -52,7 +53,7 @@ async def on_message(message):
         if message.guild.voice_client:
             print(message.content)
             creat_WAV(message.content)
-            source = discord.FFmpegPCMAudio("./open_jtalk/bin/output.wav")
+            source = discord.FFmpegPCMAudio(BASE_DIR + "/discordpy-startup/open_jtalk/bin/output.wav")
             message.guild.voice_client.play(source)
         else:
             pass
