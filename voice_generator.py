@@ -19,6 +19,7 @@ def creat_WAV(inputText):
         #message.contentをテキストファイルに書き込み
     input_file = '/tmp/input.txt'
 
+    print(inputText)
     with open(input_file,'w',encoding='shift_jis') as file:
         file.write(inputText)
 
