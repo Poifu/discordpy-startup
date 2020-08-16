@@ -51,6 +51,7 @@ async def on_message(message):
     else:
         if message.guild.voice_client:
             print(message.content)
+            
             emotion = 'normal'
             creat_WAV(message.content,filepath,emotion)
             source = discord.FFmpegPCMAudio("/app/open_jtalk/bin/output.wav")
