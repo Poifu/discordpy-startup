@@ -1,53 +1,67 @@
-import os
 import subprocess
-# from pydub import AudioSegment
+import re
 
-class creat_WAV:
-    def __init__(self):
-        self.conf = {
-            "voice_configs": {
-                "htsvoice_resource": "/app/open_jtalk/bin/",
-                "jtalk_dict": "/app/open_jtalk/bin/dic/"
-            }
-        }
+# remove_custom_emoji
+# 絵文字IDは読み上げない
+def remove_custom_emoji(text):
+    pattern = r'<:[a-zA-Z0-9_]+:[0-9]+>'    # カスタム絵文字のパターン
+    return re.sub(pattern,'',text)   # 置換処理
+
+# urlAbb
+# URLなら省略
+def urlAbb(text):
+    pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
+    return re.sub(pattern,'URLは省略するのデス！',text)   # 置換処理
+
+# creat_WAV
+# message.contentをテキストファイルに書き込み
+def creat_WAV(inputText):
+        # message.contentをテキストファイルに書き込み
+
+    inputText = remove_custom_emoji(inputText)   # 絵文字IDは読み上げない
+    inputText = urlAbb(inputText)   # URLなら省略
+    input_file = './input.txt'
+
+    with open(input_file,'w',encoding='utf-8') as file:
+        file.write(inputText)
+
+    command = 'open_jtalk -x {x} -m {m} -r {r} -ow {ow} {input_file}'
+
+    #辞書のPath
+    x = '/var/lib/mecab/dic/open-jtalk/naist-jdic'
+
+    #ボイスファイルのPath
+    m = '/usr/share/hts-voice/mei/mei_normal.htsvoice'
+    #m = 'C:/open_jtalk/bin/mei/mei_sad.htsvoice'
+    #m = 'C:/open_jtalk/bin/mei/mei_angry.htsvoice'
+    #m = 'C:/open_jtalk/bin/mei/mei_bashful.htsvoice'
+    #m = 'C:/open_jtalk/bin/mei/mei_happy.htsvoice'
+    #m = 'C:/open_jtalk/bin/mei/mei_normal.htsvoice'
+
+    #発声のスピード
+    r = '1.0'
+
+    #出力ファイル名　and　Path
+    ow = './output.wav'
+    
+    cmmd = [
+        'open_jtalk',
+        '-x', x,
+        '-m', m,
+        '-ow', ow,
+        '-r', r,
+        '-g', '-6',
+        input_file
+        ]
 
 
-    def creat_WAV(self, text):
-        filepath='/tmp/voice_message'
-        voicetype='mei'
-        emotion='normal'
-        htsvoice = {
-            'mei': {
-                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_normal.htsvoice')],
-                'angry': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_angry.htsvoice')],
-                'bashful': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_bashful.htsvoice')],
-                'happy': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_happy.htsvoice')],
-                'sad': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'mei/mei_sad.htsvoice')]
-            },
-            'm100': {
-                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'm100/nitech_jp_atr503_m001.htsvoice')]
-            },
-            'tohoku-f01': {
-                'normal': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-neutral.htsvoice')],
-                'angry': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-angry.htsvoice')],
-                'happy': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-happy.htsvoice')],
-                'sad': ['-m', os.path.join(self.conf['voice_configs']['htsvoice_resource'], 'htsvoice-tohoku-f01-master/tohoku-f01-sad.htsvoice')]
-            }
-        }
+    args= {'x':x, 'm':m, 'r':r, 'ow':ow, 'input_file':input_file}
 
-        open_jtalk = ['open_jtalk']
-        mech = ['-x', self.conf['voice_configs']['jtalk_dict']]
-        speed = ['-r', '1.0']
-        outwav = ['-ow', filepath+'.wav']
-        cmd = open_jtalk + mech + htsvoice[voicetype][emotion] + speed + outwav
-        c = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-        c.stdin.write(text.encode())
-        c.stdin.close()
-        c.wait()
-#         audio_segment = AudioSegment.from_wav(filepath+'.wav')
-#         os.remove(filepath+'.wav')
-#         audio_segment.export(filepath+'.mp3', format='mp3')
-        return filepath+'.wav'
+    cmd= command.format(**args)
+    print(cmmd)
 
-    def after_play(self, e):
-        print(e)
+    subprocess.run(cmmd)
+    return True
+
+if __name__ == '__main__':
+    creat_WAV('テスト')
